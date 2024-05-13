@@ -1,17 +1,16 @@
 /**
     Game Tools
-    v0.1 - 05-11-2021
+    OG Util
+
+    v0.1 - 02-28-2024
     Opal Games - Design and Development
-    screen: 600px x 600px
-    requirements: JS, require.js
+    requirements: ES6
+
+    see og-tools, dd
 **/
 
-console.log('loaded util');
-define(function(){
-    var test = function(){
+export default{
+    test : function(){
         return 'here we go..';
     }
-    return {
-        test : test
-    }
-});
+}

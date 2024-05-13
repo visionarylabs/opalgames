@@ -6,62 +6,68 @@
     requirements: JS, require.js
 **/
 
+//global HTML vars
+// Cross-browser support for requestAnimationFrame
+var w = window;
+var requestAnimationFrame = w.requestAnimationFrame || w.webkitRequestAnimationFrame || w.msRequestAnimationFrame || w.mozRequestAnimationFrame;
+
 console.log('game tools');
 
-require.config({
-    baseUrl: 'scripts/og',
-    paths: {
-        'util': 'ogUtil',
-        'dice': 'ogDice',
-        'board': 'ogBoard',
-    }
-});
+import util from './og/ogUtil.js';
+import dice from './og/ogDice.js';
+import board from './og/ogBoard.js';
+import canvas from './og/ogCanvas.js';
+import render from './og/ogRender.js';
+import timer from './og/ogTimer.js';
 
-requirejs(
-    [
-        'util',
-        'dice',
-        'board'
-    ],
-    function(
-        util,
-        dice,
-        board
-    ){
+/**
+* Game Tools Demo
+*/
 
+/**
+* Dice Demo
+*/
+let diceGroup1 = {
+    sides : 100,
+    count : 2,
+    modifier : 0
+}
 
-        /**
-        * Game Tools Demo
-        */
+let values = [];
+let value = 0;
 
-        /**
-        * Dice Demo
-        */
-        let diceGroup1 = {
-            sides : 100,
-            count : 2,
-            modifier : 0
-        }
+value = dice.rollDice(diceGroup1);
+console.log(value);
+values.push( value );
 
-        let values = [];
-        let value = 0;
+value = dice.rollDice(diceGroup1);
+console.log(value);
+values.push( value );
 
-        value = dice.rollDice(diceGroup1);
-        console.log(value);
-        values.push( value );
-
-        value = dice.rollDice(diceGroup1);
-        console.log(value);
-        values.push( value );
-
-        let total = dice.calculateTotal(values);
-        console.log(total);
+let total = dice.calculateTotal(values);
+console.log(total);
 
 
-        /**
-        * Board Demo
-        */
-        let boardState = board.boardFactory(10,10);
-        console.table(boardState);
-    }
-);
+/**
+* Board Demo
+*/
+let boardState = board.boardFactory(10,10);
+console.table(boardState);
+
+/**
+* Time Demo
+*/
+console.log(timer.time);
+
+/**
+* Canvas Demo
+*/
+canvas.bindCanvas(onCanvasLoaded);
+
+/**
+* Render Demo
+*/
+function onCanvasLoaded() {
+    render.drawBoard(canvas.ctx,boardState);
+	timer.loop();
+}

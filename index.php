@@ -11,7 +11,7 @@
 
         <link rel="stylesheet" type="text/css" href="main.css" media="all" />
         <link href="favicon.ico" rel="shortcut  icon">
-        <script data-main="scripts/main" src="scripts/require.js"></script>
+        <script type="module"  src="scripts/main.js"></script>
     </head>
     <body>
 

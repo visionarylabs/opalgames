@@ -6,9 +6,6 @@
     requirements: JS, require.js
 **/
 
-define(function(){
+export default{
 
-    return {
-
-    }
-});
+}
