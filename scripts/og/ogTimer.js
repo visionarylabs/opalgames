@@ -6,7 +6,6 @@
     Opal Games - Design and Development
     requirements: ES6
 **/
-import u from './ogUtil.js';
 
 let callbacksFrame = [];
 let callbacksTick = [];
@@ -26,7 +25,6 @@ const ogTimer = {
 		tickSpeed : 1000 // low = faster
 	},
 	loop : function(){
-		//u.cl('main loop','gray');
 		let t = ogTimer.time;
 		t.now = performance.now();
 		t.delta = t.now - t.then;
