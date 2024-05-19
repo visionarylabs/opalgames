@@ -9,17 +9,18 @@
     see ogBoard, og-tools, dd, warcapade, wierdquest
 **/
 import u from './ogUtil.js';
-import config from '../config.js';
 
-u.clc('Board Module Loaded','orange');
+export class Board{
 
-export default{
+    constructor(config,state){
+        u.clc('New Board Module Loaded','Yellow');
+        this.config = config;
+        this.state = state;
+        this.tileSize = config.screen.tileSize;
+        this.boardState = [];
+    }
 
-    tileSize : config.screen.tileSize,
-
-    boardState : [],
-
-    boardFactory : function() {
+    boardFactory() {
         var board = [];
         var tile = null;
         var iCol = 0;
@@ -28,8 +29,8 @@ export default{
         var color = '#cccccc';
         var tileType = null;
 
-        for( iRow; iRow < config.screen.boardSize; iRow++ ) {
-            for( iCol; iCol < config.screen.boardSize; iCol++ ) {
+        for( iRow; iRow < this.config.screen.boardSize; iRow++ ) {
+            for( iCol; iCol < this.config.screen.boardSize; iCol++ ) {
                 num++;
                 tileType = 'tile';
                 tile = this.tileFactory( num, iCol+1, iRow+1, tileType, iCol * this.tileSize, iRow * this.tileSize, color );
@@ -39,9 +40,9 @@ export default{
         }
 
         return board;
-    },
+    }
 
-    tileFactory : function(num,col,row,tileType,x,y,color) {
+    tileFactory(num,col,row,tileType,x,y,color) {
         var tile = {
             num : num,
             col : col,
@@ -58,13 +59,13 @@ export default{
             //tile.ui.image.src = './images/wq-tile.png';
         }
         return tile;
-    },
+    }
 
-    makeBoard : function(){
+    makeBoard(){
         this.boardState = this.boardFactory();
-    },
+    }
 
-    updateBoardByMouse : function(pos){
+    updateBoardByMouse(pos){
         this.clearTilesByState('highlight');
         //update from pos
         if(!pos) return;
@@ -72,9 +73,9 @@ export default{
         if(tileNum){
             this.boardState[tileNum-1].highlight = true;
         }
-    },
+    }
 
-    colorTileWithClick : function(pos){
+    colorTileWithClick(pos){
         if(!pos) return;
         let tileNum = this.getTileNumFromPos(pos);
         if(tileNum){
@@ -85,19 +86,19 @@ export default{
                 tile.selected = true;
             }
         }
-    },
+    }
 
-    updateTileUi : function(tiles){
+    updateTileUi(tiles){
         var loopLength = tiles.length;
         var i = 0;
         for(i = 0; i < loopLength; i++) {
             this.boardState[i].ui = tiles[i];
         }
-    },
-    checkForEmptySpace : function(tileNum){
+    }
+    checkForEmptySpace(tileNum){
         let tile = this.boardState[tileNum-1];
         if(tile.contains.length == 0) return true;
-    },
+    }
 
 
 /**
@@ -105,60 +106,60 @@ export default{
     FROM OGTOOLS
 **/
 
-    setStartingTiles : function(spriteType){
-        if (!state.sprites.hasOwnProperty(spriteType)){
+    setStartingTiles(spriteType){
+        if (!this.state.sprites.hasOwnProperty(spriteType)){
             return;
         }
-        var loopLength = state.sprites[spriteType].length;
+        var loopLength = this.state.sprites[spriteType].length;
         var tileNum = null;
         var sprite = null;
         var tempPos = null;
         var i = 0;
         for(i = 0; i < loopLength; i++) {
-            sprite = state.sprites[spriteType][i];
-            tileNum = state.sprites[spriteType][i].tile;
+            sprite = this.state.sprites[spriteType][i];
+            tileNum = this.state.sprites[spriteType][i].tile;
             tempPos = getPosFromTileNum(tileNum);
             placeSprite(sprite.slug,tileNum);
             snapSpriteToTile(sprite.slug,tempPos);
         }
-    },
+    }
 
     //on reset -- scramble the board
-    scrambleSprites : function(spriteType) {
-        if (!state.sprites.hasOwnProperty(spriteType)){
+    scrambleSprites(spriteType) {
+        if (!this.state.sprites.hasOwnProperty(spriteType)){
             return;
         }
-        var loopLength = state.sprites[spriteType].length;
+        var loopLength = this.state.sprites[spriteType].length;
         var tileNum = null;
         var sprite = null;
         var tempPos = null;
         var i = 0;
         for(i = 0; i < loopLength; i++) {
-            sprite = state.sprites[spriteType][i];
+            sprite = this.state.sprites[spriteType][i];
             tileNum = getRandomUnoccupiedTile();
             tempPos = getPosFromTileNum(tileNum);
             placeSprite(sprite.slug,tileNum);
             snapSpriteToTile(sprite.slug,tempPos);
         }
-    },
+    }
 
-    getPosFromTileNum : function(tileNum) {
+    getPosFromTileNum(tileNum) {
         var pos = {};
         var tileId = convertTileNumToId(tileNum);
 
         pos.x = board[tileId].ui.x;
         pos.y = board[tileId].ui.y;
         return pos;
-    },
+    }
 
-    getTileByNum : function(num){
+    getTileByNum(num){
         var tileId = convertTileNumToId(num);
         return board[tileId];
-    },
+    }
 
     //look through tiles and find empty
     //could need rules edits for double occupants
-    getRandomUnoccupiedTile : function() {
+    getRandomUnoccupiedTile() {
         var getTileNum = Math.floor( (Math.random() * options.rows * options.columns) + 1 );
         var availableTiles = [];
         var loopLength = board.length;
@@ -170,21 +171,21 @@ export default{
         var randomKey = Math.floor((Math.random() * availableTiles.length));
         getTileNum = availableTiles[randomKey];
         return getTileNum;
-    },
+    }
 
     //Set the sprite state
-    placeSpritesOnBoard : function(sprites){
+    placeSpritesOnBoard(sprites){
         sprites.forEach((element, index) => {
             this.placeSpriteOnSpace(element);
         });
-    },
+    }
 
-    placeSpriteOnSpace : function(sprite){
+    placeSpriteOnSpace(sprite){
         let tile = this.boardState[sprite.space-1];
         tile.contains.push(sprite.slug);
-    },
+    }
 
-    moveSpriteToTile : function(slug,tileNum){
+    moveSpriteToTile(slug,tileNum){
         var sprite = og.tools.getSprite(slug);
         if(!sprite) return;
         var tileId = convertTileNumToId(sprite.tile);
@@ -192,25 +193,25 @@ export default{
         sprite.tile = tileNum; //set the sprite tile num to the new num
         board[sprite.tile - 1].contains.push(sprite.slug);
         og.tools.msg(sprite.slug + ' moves');
-    },
+    }
 
     //Set the sprite state
-    placeSprite : function(slug,tileNum){
+    placeSprite(slug,tileNum){
         var sprite = og.tools.getSprite(slug);
         if(!sprite) return;
         var tileId = convertTileNumToId(sprite.tile);
         board[tileId].contains = []; //set the sprite tile to be empty
         sprite.tile = tileNum; //set the sprite tile num to the new num
         board[sprite.tile - 1].contains.push(sprite.slug);
-    },
+    }
 
-    snapSpriteToTile : function(slug,pos){
+    snapSpriteToTile(slug,pos){
         var node = og.tools.getNode(slug);
         node.ui.x = pos.x;
         node.ui.y = pos.y;
-    },
+    }
 
-    showMoveTargets : function(tileId,num){
+    showMoveTargets(tileId,num){
         var tileIds = [];
 
         //first round of tiles
@@ -238,9 +239,9 @@ export default{
                 board[tileIds[i]].action = 'moveTarget';
             }
         }
-    },
+    }
 
-    getAdjacentTiles : function(tileNum,unoccupied){
+    getAdjacentTiles(tileNum,unoccupied){
         var tiles = [];
         var loopLength = board.length;
         var id = convertTileNumToId(tileNum);
@@ -261,9 +262,9 @@ export default{
             }
         }
         return tiles;
-    },
+    }
 
-    getAdjacentUnoccupiedTiles : function(tileNum){
+    getAdjacentUnoccupiedTiles(tileNum){
         var tiles = [];
         var loopLength = board.length;
         var id = convertTileNumToId(tileNum);
@@ -280,10 +281,10 @@ export default{
             }
         }
         return tiles;
-    },
+    }
 
     //returns and marks for render possible action tiles
-    markActionTiles : function(tiles){
+    markActionTiles(tiles){
         var loopLength = tiles.length;
         for(i = 0; i < loopLength; i++) {
             var id = convertTileNumToId(tiles[i])
@@ -293,9 +294,9 @@ export default{
         if( rules.hasOwnProperty('processActionTiles') ){
             return rules.processActionTiles(tiles);
         }
-    },
+    }
 
-    clearAllTileStates : function(){
+    clearAllTileStates(){
         this.boardState.forEach((element, index) => {
             element.action = false;
             element.target = false;
@@ -303,29 +304,29 @@ export default{
             element.selected = false;
             element.highlight = false;
         });
-    },
+    }
 
-    clearTilesByState: function(tileState){
+    clearTilesByState(tileState){
         this.boardState.forEach((element, index) => {
             element[tileState] = false;
         });
-    },
+    }
 
-    clearTileHighlights : function(){
+    clearTileHighlights(){
         this.boardState.forEach((element, index) => {
             element.highlight = false;
         });
-    },
+    }
 
-    clearAllTiles : function(){
+    clearAllTiles(){
         this.boardState.forEach((element, index) => {
             element.contains = [];
         });
-    },
+    }
 
     //TOOLS PRIVATE
 
-    getTileNumFromPos : function(pos) {
+    getTileNumFromPos(pos) {
         if(!pos) return;
         let board = this.boardState;
         var tileNum = null;
@@ -343,11 +344,11 @@ export default{
             }
         }
         return tileNum;
-    },
+    }
 
-    convertTileNumToId : function( num ){
+    convertTileNumToId( num ){
         var tileId = num - 1;
         return tileId;
-    },
+    }
 
 }

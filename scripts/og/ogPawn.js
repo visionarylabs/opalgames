@@ -13,19 +13,20 @@
     'space' : 5,
 
 **/
-import config from '../config.js';
-import state from '../state.js';
 
 import u from './ogUtil.js';
 
-u.clc('Pawn Loaded','orange');
-
-export default{
-    addSprite : function(sprite) {
-        state.sprites.push(sprite);
-    },
-    pawnFactory : function(args) {
+export class Pawn{
+    constructor(state){
+        this.state = state;
+        u.clc('New Pawn Class Loaded','yellow');
+        u.cl(this.state);
+    }
+    addSprite(sprite) {
+        this.state.sprites.push(sprite);
+    }
+    pawnFactory(args) {
         var pawn = Object.assign({ ui: {} }, args);
         return pawn;
-    },
+    }
 }

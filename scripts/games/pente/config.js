@@ -1,8 +1,10 @@
 // config.js
 
-let canvasSize = 600;
-let boardSize = 8;
+let canvasSize = 800;
+let boardSize = 19;
 let tileSize = canvasSize / boardSize;
+
+console.log('Config Loaded');
 
 export default{
     screen: {
@@ -11,7 +13,7 @@ export default{
         tileSize: tileSize,
     },
     debug:{
-        showTileNumber : true
+        showTileNumber : false
     }
     // Other configuration parameters...
 };

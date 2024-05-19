@@ -23,20 +23,24 @@
 
 **/
 import u from './ogUtil.js';
-import canvas from './ogCanvas.js';
-import config from '../config.js';
+import {Canvas} from './ogCanvas.js';
 
-u.clc('Import Module Loaded','orange');
+export class Render{
 
-export default{
-    drawSprites : function(ctx,sprites){
+    constructor(config){
+        this.config = config;
+        this.canvas = new Canvas(config);
+        u.clc('New Render Class Loaded','yellow');
+    }
+
+    drawSprites(ctx,sprites){
         u.clc('Draw Sprites','red');
         sprites.forEach((value,key) => {
             u.cl(value);
         });
-    },
+    }
 
-    drawBoard : function(ctx,board,sprites) {
+    drawBoard(ctx,board,sprites) {
 
             let tiles = [];
 
@@ -53,7 +57,7 @@ export default{
                     occupied : '#ffffff',
                 }
 
-                let tileSize = config.screen.tileSize;
+                let tileSize = this.config.screen.tileSize;
                 let x = tile.col * tileSize - tileSize;
                 let y = tile.row * tileSize - tileSize;
                 //draw the tile
@@ -78,7 +82,7 @@ export default{
 
                 ctx.fillRect(x+1,y+1,tileSize-2,tileSize-2);
                 tiles[tile.num-1] = {x:x,y:y}
-                if(config.debug.showTileNumber){
+                if(this.config.debug.showTileNumber){
                     ctx.font = "11px Helvetica";
                     ctx.fillStyle = "rgb(20,20,20)";
                     ctx.fillText(tile.num, x + 2, y + 1);
@@ -101,25 +105,24 @@ export default{
             });
 
             return tiles;
-    },
+    }
 
     /**
         MODAL UI BOX
     **/
-    showModal : function(message){
-        let ctx = canvas.ctx;
+    showModal(ctx,message){
         var verticalOffset = 20;
         var horizontalOffset = 40;
         var modalOffset = 20;
         verticalOffset += modalOffset;
         ctx.fillStyle = 'rgba(255,255,255,.5)';
-        ctx.fillRect( modalOffset, modalOffset, config.screen.canvasSize - (modalOffset*2), config.screen.canvasSize - (modalOffset*2) );
+        ctx.fillRect( modalOffset, modalOffset, this.config.screen.canvasSize - (modalOffset*2), this.config.screen.canvasSize - (modalOffset*2) );
         ctx.fillStyle = "rgb(0, 0, 0)";
         ctx.font = "18px Helvetica";
         ctx.font = "24px Helvetica";
         ctx.textAlign = "left";
         ctx.textBaseline = "top";
         ctx.fillText(message, horizontalOffset, verticalOffset);
-    },
+    }
 
 }
