@@ -33,14 +33,8 @@ export class Pente{
         this.state.restartGame();
 
         u.clc('all sprites','orange');
-        console.log(this.state.sprites);
+        u.cl(this.state.sprites);
         //u.cl(boardState);
-
-        /**
-        * Time Demo
-        */
-        console.log('TIMER');
-        console.log(timer.time);
 
         /**
         * Canvas Demo
@@ -76,8 +70,8 @@ export class Pente{
     * CLICK CALLBACK
     **/
     callBackClick(click) {
-        u.cl('CLICK');
-        u.clc('click pos:' + ' ' + click.x + ':' + click.y , 'red');
+        //u.cl('CLICK');
+        //u.clc('click pos:' + ' ' + click.x + ':' + click.y , 'red');
         //ALL MAIN GAME / GRID CLICK LOGIC HERE:
         if(this.state.game.phase == 'start') this.state.game.phase = 'game';
         if(this.state.game.phase == 'end'){
@@ -89,7 +83,8 @@ export class Pente{
         this.board.colorTileWithClick(click);
         this.state.placeNextPawn(tileNum);
         this.state.setNextPlayer();
-        u.cl(this.state);
+        //u.cl('State:');
+        //u.cl(this.state);
         let winnerColor = this.state.checkWinCondition();
         if(winnerColor){
             u.clc('WINNER!!!!!!!!!!!!!!!!!!!','yellow');

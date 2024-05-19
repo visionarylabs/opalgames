@@ -1,7 +1,7 @@
 // config.js
 
 let canvasSize = 800;
-let boardSize = 19;
+let boardSize = 21;
 let tileSize = canvasSize / boardSize;
 
 console.log('Config Loaded');

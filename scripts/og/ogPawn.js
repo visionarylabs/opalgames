@@ -20,7 +20,6 @@ export class Pawn{
     constructor(state){
         this.state = state;
         u.clc('New Pawn Class Loaded','yellow');
-        u.cl(this.state);
     }
     addSprite(sprite) {
         this.state.sprites.push(sprite);

@@ -36,7 +36,7 @@ export class Render{
     drawSprites(ctx,sprites){
         u.clc('Draw Sprites','red');
         sprites.forEach((value,key) => {
-            u.cl(value);
+            //u.cl(value);
         });
     }
 
@@ -90,6 +90,7 @@ export class Render{
                     ctx.fillText(tile.col, x + 2, y + 21);
                 }
 
+                //draw contents
                 if(tile.contains.length > 0){
                     sprites.forEach((value,key) => {
                         if(value.slug == tile.contains[0]){

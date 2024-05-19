@@ -87,6 +87,13 @@ export class Board{
             }
         }
     }
+    highlightTileSet(tiles){
+        var loopLength = tiles.length;
+        var i = 0;
+        for(i = 0; i < loopLength; i++) {
+            this.boardState[i].selected = true;
+        }
+    }
 
     updateTileUi(tiles){
         var loopLength = tiles.length;
@@ -324,8 +331,72 @@ export class Board{
         });
     }
 
-    //TOOLS PRIVATE
+    //CHECKS
+    checkAllTileContentsForRuns(minimumLengthToCheck) {
+        const checkData = {
+            rows: [],
+            columns: [],
+            diagonals_right: [],
+            diagonals_left: [],
+        };
+        let startingKeyNum = 0;
 
+        // Function to check tile contents for runs in rows, columns, or diagonals
+        const checkTileContents = (tiles, keyType, keyNum) => {
+            tiles.forEach(tile => {
+                const key = tile[keyType];
+                if (!checkData[keyType][keyNum]) checkData[keyType][keyNum] = [];
+                checkData[keyType][keyNum].push(tile.contains.length > 0 ? tile.contains[0] : 'N');
+            });
+        };
+
+        // Rows and columns
+        for (let i = 1; i <= this.config.screen.boardSize; i++) {
+            checkTileContents(this.boardState.filter(tile => tile.row === i), 'rows', i);
+            checkTileContents(this.boardState.filter(tile => tile.col === i), 'columns', i);
+        }
+
+        // Right diagonals Top Edge
+        for (let i = 0; i <= this.config.screen.boardSize - minimumLengthToCheck; i++) {
+            //this.boardState[i].selected = true;
+            const diagonalTiles = this.boardState.filter(tile => tile.col - tile.row === i);
+            //diagonalTiles.forEach( tile => {tile.selected = true;});
+            checkTileContents(diagonalTiles, 'diagonals_right', i);
+        }
+        // Right diagonals Left Edge
+        // i = 1 to skip 0 for skip first tile
+        startingKeyNum = checkData.diagonals_right.length - 1;
+        for (let i = 1; i <= this.config.screen.boardSize - minimumLengthToCheck; i++) {
+            let tileKey = (i * this.config.screen.boardSize);
+            //this.boardState[tileKey].selected = true;
+            const diagonalTiles = this.boardState.filter(tile => tile.row - tile.col === i);
+            //diagonalTiles.forEach( tile => {tile.selected = true;});
+            checkTileContents(diagonalTiles, 'diagonals_right', startingKeyNum);
+        }
+
+        // Left diagonals Top Edge
+        for (let i = (minimumLengthToCheck - 1); i <= this.config.screen.boardSize - 1; i++) {
+            //this.boardState[i].selected = true;
+            const diagonalTiles = this.boardState.filter(tile => tile.col + tile.row === i + 2);
+            //diagonalTiles.forEach( tile => {tile.selected = true;});
+            checkTileContents(diagonalTiles, 'diagonals_left', i);
+        }
+        // Left diagonals Right Edge
+        startingKeyNum = checkData.diagonals_left.length - 1;
+        for (let i = 0; i <= this.config.screen.boardSize - minimumLengthToCheck; i++) {
+            let tileKey = (i * this.config.screen.boardSize) + this.config.screen.boardSize - 1;
+            //this.boardState[tileKey].selected = true;
+            const diagonalTiles = this.boardState.filter(tile => tile.col + tile.row === (i + 1) + this.config.screen.boardSize);
+            //diagonalTiles.forEach( tile => {tile.selected = true;});
+            checkTileContents(diagonalTiles, 'diagonals_left', startingKeyNum);
+        }
+
+        //u.cl(checkData);
+        return checkData;
+    }
+
+
+    //TOOLS PRIVATE
     getTileNumFromPos(pos) {
         if(!pos) return;
         let board = this.boardState;
