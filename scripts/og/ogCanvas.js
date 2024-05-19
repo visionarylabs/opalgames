@@ -81,6 +81,5 @@ export class Canvas{
     }
     registerCallbackClick(callback) {
         this.callbacksClick.push(callback);
-        console.log(callback);
     }
 }
