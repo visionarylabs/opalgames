@@ -1,14 +1,31 @@
 /**
     Game Tools
-    v0.1 - 05-11-2021
+    OG Pawn
+
+    v0.1 - 05-16-2024
     Opal Games - Design and Development
-    screen: 600px x 600px
-    requirements: JS, require.js
+    requirements: ES6
+
+    PAWN:
+    'slug' : 'one',
+    'color' : '#009900',
+    'letter' : 'A',
+    'space' : 5,
+
 **/
+import config from '../config.js';
+import state from '../state.js';
 
-define(function(){
+import u from './ogUtil.js';
 
-    return {
+u.clc('Pawn Loaded','orange');
 
-    }
-});
+export default{
+    addSprite : function(sprite) {
+        state.sprites.push(sprite);
+    },
+    pawnFactory : function(args) {
+        var pawn = Object.assign({ ui: {} }, args);
+        return pawn;
+    },
+}

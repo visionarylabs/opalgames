@@ -8,6 +8,12 @@
 
     see og-tools, dd
 **/
+import u from './ogUtil.js';
+import config from '../config.js';
+
+u.clc('Board Module Loaded','orange');
+
+let callbacksClick = [];
 
 const ogCanvas = {
 
@@ -17,7 +23,7 @@ const ogCanvas = {
     click : {},
 
     bindCanvas : function(callback){
-        console.log('bind canvas');
+        u.clc('bind canvas','yellow');
         document.addEventListener('DOMContentLoaded', () => {
 
             //get the canvas element and set the size and context
@@ -36,10 +42,17 @@ const ogCanvas = {
 
     buildCanvas : function(){
         this.canvas = document.getElementById('game-canvas');
-        this.canvas.width = 600;
-        this.canvas.height = 600;
+        this.canvas.width = config.screen.canvasSize;
+        this.canvas.height = config.screen.canvasSize;
+        this.gameArea = document.getElementById('game-area');
+        this.gameArea.style.width = config.screen.canvasSize;
+        this.gameArea.style.height = config.screen.canvasSize;
         this.canvas.onselectstart = function () { return false; } //stop text select on double click
         this.ctx = this.canvas.getContext("2d");
+        this.ctx.textAlign = "left";
+        this.ctx.textBaseline = "top";
+        this.ctx.font = "12px Helvetica";
+        this.ctx.fillStyle = "rgb(0,0,0)";
     },
 
     addCanvasListeners : function(){
@@ -47,13 +60,13 @@ const ogCanvas = {
         //mouse move on canvas
         this.canvas.addEventListener('mousemove', (e) => {
             this.pos = this.getMousePos(this.canvas,e);
-            console.log('mouse pos:' + ' ' + this.pos.x + ':' + this.pos.y);
+            //u.clc('mouse pos:' + ' ' + this.pos.x + ':' + this.pos.y, 'gray');
         });
 
         //click on canvas
         this.canvas.addEventListener('click', (e) => {
             this.click = this.getMousePos(this.canvas,e);
-            console.log('click pos:' + ' ' + this.click.x + ':' + this.click.y);
+            callbacksClick.forEach(callback => callback(this.click));
         });
 
     },
@@ -65,7 +78,9 @@ const ogCanvas = {
             y: Math.floor(e.clientY - rect.top)
         };
     },
-
+    registerCallbackClick : function(callback) {
+        callbacksClick.push(callback);
+    }
 }
 
 export default ogCanvas;

@@ -10,7 +10,13 @@
 **/
 
 export default{
-    test : function(){
-        return 'here we go..';
+    cl : function(string){
+        console.log(string);
+    },
+    clc : function(string,color){
+        console.log('%c '+string, 'color: '+color+'; font-weight: bold;');
+    },
+    clt : function(string,color){
+        console.log('%c '+string, 'color: '+color+'; font-weight: bold; border: 3px solid '+color+'; padding: 5px; background: #eee');
     }
 }

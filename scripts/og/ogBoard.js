@@ -6,19 +6,20 @@
     Opal Games - Design and Development
     requirements: ES6
 
-    see og-tools, dd, warcapade, wierdquest
+    see ogBoard, og-tools, dd, warcapade, wierdquest
 **/
+import u from './ogUtil.js';
+import config from '../config.js';
+
+u.clc('Board Module Loaded','orange');
 
 export default{
 
-    tileSize : 20,
-    board : [1,2,3,4],
+    tileSize : config.screen.tileSize,
 
-    init : function(){
-        console.log('Board Module Loaded');
-    },
+    boardState : [],
 
-    boardFactory : function(cols,rows) {
+    boardFactory : function() {
         var board = [];
         var tile = null;
         var iCol = 0;
@@ -27,8 +28,8 @@ export default{
         var color = '#cccccc';
         var tileType = null;
 
-        for( iRow; iRow < rows; iRow++ ) {
-            for( iCol; iCol < cols; iCol++ ) {
+        for( iRow; iRow < config.screen.boardSize; iRow++ ) {
+            for( iCol; iCol < config.screen.boardSize; iCol++ ) {
                 num++;
                 tileType = 'tile';
                 tile = this.tileFactory( num, iCol+1, iRow+1, tileType, iCol * this.tileSize, iRow * this.tileSize, color );
@@ -48,7 +49,9 @@ export default{
             tileType : tileType,
             contains : [], // reference to sprite in game list
             ui : null,
-            action : null //current,moveTarget,attackTarget,actionTarget
+            action : null, //current,moveTarget,attackTarget,actionTarget
+            highlight : false,
+            selected : false,
         };
         //tile.ui = setUi(x,y,this.tileSize,this.tileSize,color,0,0,0);
         if(tile.tileType === 'tile'){
@@ -56,6 +59,51 @@ export default{
         }
         return tile;
     },
+
+    makeBoard : function(){
+        this.boardState = this.boardFactory();
+    },
+
+    updateBoardByMouse : function(pos){
+        this.clearTilesByState('highlight');
+        //update from pos
+        if(!pos) return;
+        let tileNum = this.getTileNumFromPos(pos);
+        if(tileNum){
+            this.boardState[tileNum-1].highlight = true;
+        }
+    },
+
+    colorTileWithClick : function(pos){
+        if(!pos) return;
+        let tileNum = this.getTileNumFromPos(pos);
+        if(tileNum){
+            let tile = this.boardState[tileNum-1];
+            let wasSelected = tile.selected;
+            this.clearTilesByState('selected');
+            if(!wasSelected){
+                tile.selected = true;
+            }
+        }
+    },
+
+    updateTileUi : function(tiles){
+        var loopLength = tiles.length;
+        var i = 0;
+        for(i = 0; i < loopLength; i++) {
+            this.boardState[i].ui = tiles[i];
+        }
+    },
+    checkForEmptySpace : function(tileNum){
+        let tile = this.boardState[tileNum-1];
+        if(tile.contains.length == 0) return true;
+    },
+
+
+/**
+    TO VET
+    FROM OGTOOLS
+**/
 
     setStartingTiles : function(spriteType){
         if (!state.sprites.hasOwnProperty(spriteType)){
@@ -125,6 +173,17 @@ export default{
     },
 
     //Set the sprite state
+    placeSpritesOnBoard : function(sprites){
+        sprites.forEach((element, index) => {
+            this.placeSpriteOnSpace(element);
+        });
+    },
+
+    placeSpriteOnSpace : function(sprite){
+        let tile = this.boardState[sprite.space-1];
+        tile.contains.push(sprite.slug);
+    },
+
     moveSpriteToTile : function(slug,tileNum){
         var sprite = og.tools.getSprite(slug);
         if(!sprite) return;
@@ -149,6 +208,36 @@ export default{
         var node = og.tools.getNode(slug);
         node.ui.x = pos.x;
         node.ui.y = pos.y;
+    },
+
+    showMoveTargets : function(tileId,num){
+        var tileIds = [];
+
+        //first round of tiles
+        tileIds = getAdjacentTiles(tileId);
+        num--;
+
+        var i = 0;
+        var j = 0;
+        var loopLength = 0;
+
+        //rest of the rounds per movement rating
+        //TODO optimize this!
+        for(j = 0; j < num; j++) {
+            loopLength = tileIds.length;
+            for(i = 0; i < loopLength; i++) {
+                tileIds = tileIds.concat( getAdjacentTiles(tileIds[i]) );
+            }
+        }
+
+        //Mark Tiles as Move Targets
+        i = 0;
+        loopLength = tileIds.length;
+        for(i = 0; i < loopLength; i++) {
+            if(board[tileIds[i]].contains.length == 0){
+                board[tileIds[i]].action = 'moveTarget';
+            }
+        }
     },
 
     getAdjacentTiles : function(tileNum,unoccupied){
@@ -206,34 +295,49 @@ export default{
         }
     },
 
-    clearActionTiles : function(tiles){
-        var loopLength = board.length;
-        for(i = 0; i < loopLength; i++) {
-            board[i].action = false;
-            board[i].target = false;
-            board[i].current = false;
-        }
+    clearAllTileStates : function(){
+        this.boardState.forEach((element, index) => {
+            element.action = false;
+            element.target = false;
+            element.current = false;
+            element.selected = false;
+            element.highlight = false;
+        });
     },
 
-    clearAllTiles : function(tiles){
-        var loopLength = board.length;
-        for(i = 0; i < loopLength; i++) {
-            var tile = board[i].contains = [];
-        }
+    clearTilesByState: function(tileState){
+        this.boardState.forEach((element, index) => {
+            element[tileState] = false;
+        });
+    },
+
+    clearTileHighlights : function(){
+        this.boardState.forEach((element, index) => {
+            element.highlight = false;
+        });
+    },
+
+    clearAllTiles : function(){
+        this.boardState.forEach((element, index) => {
+            element.contains = [];
+        });
     },
 
     //TOOLS PRIVATE
 
-    getTileNumFromClick : function(click) {
+    getTileNumFromPos : function(pos) {
+        if(!pos) return;
+        let board = this.boardState;
         var tileNum = null;
         var iTile = 0;
         var loopLength = board.length;
         for(iTile; iTile < loopLength; iTile++) {
+            if(!board[iTile].ui) continue;
             if(
-                board[iTile].ui.x < mouse.x &&
-                board[iTile].ui.y < mouse.y &&
-                board[iTile].ui.x >= mouse.x - this.tileSize &&
-                board[iTile].ui.y >= mouse.y - this.tileSize
+                board[iTile].ui.x < pos.x &&
+                board[iTile].ui.y < pos.y &&
+                board[iTile].ui.x >= pos.x - this.tileSize &&
+                board[iTile].ui.y >= pos.y - this.tileSize
             ) {
                 tileNum = board[iTile].num;
             }
